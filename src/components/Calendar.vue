@@ -4,21 +4,21 @@ import WeekHeader from './WeekHeader.vue';
 </script>
 
 <template>
-    <div style="width: fit-content; display: flex; flex-direction: column; gap: 0.1rem">
-        <div style="display: flex; gap: 0.1rem; justify-content: space-between; padding: 0.1rem;">
+    <div class="calendar-container">
+        <div class="calendar-item" style="justify-content: space-between;">
             <select v-model="locale" style="width: 7rem;">
                 <option v-for="language in languages" :value="language.id">{{ language.label }}</option>
             </select>
             <input placeholder="yyyy-mm-dd" v-model="searchDateString" @change="parseDate()" style="width: 10rem;"></input>
         </div>
-        <div style="display: flex; gap: 0.1rem; justify-content: space-between; padding: 0.1rem;">
+        <div class="calendar-item" style="justify-content: space-between; margin-top: 0.5rem;">
             <button @click="decreaseMonth"><i class="arrow left"></i></button>
             <div>
                 {{ monthLabel }} {{ year }}
             </div>
             <button @click="increaseMonth"><i class="arrow right"></i></button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 0.1rem;">
+        <div class="calendar-item" style="flex-direction: column;">
             <WeekHeader :days="weekDays"/>
             <Week v-for="week in weeks" :days="week" @select-day="(day) => changeCurrentDate(day)"/>
         </div>   
@@ -43,7 +43,8 @@ export default {
         searchDateString: null,
         languages: [
             {id:'en-EN', label:'English'},
-            {id:'ru-RU', label:'Русский'}
+            {id:'ru-RU', label:'Русский'},
+            {id: 'de-DE', label: 'Deutsch'}
         ]
     }
   },
@@ -62,7 +63,6 @@ export default {
             const monday = new Date(2023, 0, 2);
             const res = [];
             
-            // Получаем названия всех дней недели
             for (let i = 0; i < 7; i++) {
                 const date = new Date(monday);
                 date.setDate(monday.getDate() + i);
@@ -145,7 +145,9 @@ export default {
         this._currentDate = date;
         this.month = this._currentDate.getMonth();
         this.year = this._currentDate.getFullYear();
-        this.$emit('selectDay', date);
+        let tzoffset = this._currentDate.getTimezoneOffset() * 60000; //
+        let localISOTime = (new Date(this._currentDate - tzoffset)).toISOString().slice(0, -1);
+        this.$emit('selectDay', localISOTime.split('T')[0]);
     },
     parseDate() {
         const regex = /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/;
@@ -174,6 +176,20 @@ export default {
 </script>
 
 <style scoped>
+.calendar-container {
+    width: fit-content; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 0.2rem;
+    padding: 1rem;
+    border: 0.05rem solid lightgray;
+    border-radius: 0.5rem;
+}
+.calendar-item {
+    display: flex; 
+    gap: 0.1rem;  
+    padding: 0.1rem;
+}
 button {
     background-color: transparent;
     border: none;

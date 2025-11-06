@@ -48,6 +48,7 @@ export default {
         text-align: center;
         align-content: center;
         border: 0.1rem solid transparent;
+        border-radius: 0.5rem;
     }
     .not-current {
         background-color: lightgrey;

@@ -4,7 +4,7 @@ import Calendar from './components/Calendar.vue';
 
 <template>
   <h1>Календарь</h1>
-  <Calendar :current-date="'2024-12-20'"/>
+  <Calendar current-date="2024-12-20" @select-day="(day) => console.log(day)"/>
 </template>
 
 <script>
