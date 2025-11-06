@@ -12,7 +12,7 @@ import WeekHeader from './WeekHeader.vue';
             <select v-model="currentLanguage" style="width: 7rem;">
                 <option v-for="language in languages" :value="language.id">{{ language.label }}</option>
             </select>
-            <input v-model="searchDate" style="width: 10rem;"></input>
+            <input v-model="searchDateString" @change="parseDate()" style="width: 10rem;"></input>
         </div>
         <div style="display: flex; gap: 0.1rem; justify-content: space-between; padding: 0.1rem;">
             <button @click="decreaseMonth"><i class="arrow left"></i></button>
@@ -37,7 +37,7 @@ export default {
         month: null,
         year: null,
         currentDate: null,
-        searchDate: null,
+        searchDateString: null,
 
         // weeks: [
         //     [1,2,3,4,5,6,7],
@@ -66,20 +66,22 @@ export default {
                 return [];
             const weeks = [];
 
-            const firstDay = new Date(this.year, this.month, 1);
-            const lastDay = new Date(this.year, this.month + 1, 0);
+            const firstDay = new Date(this.year, this.month, 1); // первый день месяца
+            const lastDay = new Date(this.year, this.month + 1, 0); // последний день месяца
 
             const startDate = new Date(firstDay);
             const dayOfWeek = firstDay.getDay(); 
 
             const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-            startDate.setDate(firstDay.getDate() + mondayOffset);
+            startDate.setDate(firstDay.getDate() + mondayOffset); // определяем первый день в неделе
             
-            let currentDate = new Date(startDate);
+            let currentDate = new Date(startDate); // заводим счетчик
 
-            while (currentDate <= lastDay || 
-                new Date(currentDate.getTime() + 6 * 24 * 60 * 60 * 1000) <= lastDay ||
-                weeks.length === 0) {
+            while (
+                currentDate <= lastDay || 
+                new Date(currentDate.getTime() + 6 * 24 * 60 * 60 * 1000) <= lastDay || 
+                weeks.length === 0
+            ) {
                 
                 const week = [];
 
@@ -113,7 +115,6 @@ export default {
         } else {
             this.month -= 1;
         }
-        console.log(this.weeks);
     },
     increaseMonth() {
         if (this.month == 11) {
@@ -122,7 +123,18 @@ export default {
         } else {
             this.month += 1;
         }
-        console.log(this.weeks);
+    },
+    parseDate() {
+        let searchDate = null;
+        try {
+            searchDate = new Date(this.searchDateString);
+            this.searchDateString = null;
+            this.currentDate = searchDate;
+            this.month = this.currentDate.getMonth();
+            this.year = this.currentDate.getFullYear();
+        } catch (error) {
+            return console.log('Error! Wrong format date!')
+        }
     }
   },
   mounted() {
