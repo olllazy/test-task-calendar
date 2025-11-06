@@ -28,12 +28,18 @@ import WeekHeader from './WeekHeader.vue';
 <script>
 export default {
   name: 'Calendar',
+  props: {
+    currentDate: {
+        type: String,
+        required: false,
+    }
+  },
   data() {
     return {
         locale: 'ru-RU',
         month: null,
         year: null,
-        currentDate: null,
+        _currentDate: null,
         searchDateString: null,
         languages: [
             {id:'en-EN', label:'English'},
@@ -82,30 +88,30 @@ export default {
             const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
             startDate.setDate(firstDay.getDate() + mondayOffset); // определяем первый день в неделе
             
-            let currentDate = new Date(startDate); // заводим счетчик
+            let _currentDate = new Date(startDate); // заводим счетчик
 
             while (
-                currentDate <= lastDay || 
-                new Date(currentDate.getTime() + 6 * 24 * 60 * 60 * 1000) <= lastDay || 
+                _currentDate <= lastDay || 
+                new Date(_currentDate.getTime() + 6 * 24 * 60 * 60 * 1000) <= lastDay || 
                 weeks.length === 0
             ) {
                 
                 const week = [];
 
                 for (let i = 0; i < 7; i++) {
-                    const dayDate = new Date(currentDate);
+                    const dayDate = new Date(_currentDate);
                     const dayInfo = {
                         date: dayDate,
                         day: dayDate.getDate(),
                         isCurrentMonth: dayDate.getMonth() === this.month && dayDate.getFullYear() === this.year,
-                        isCurrentDay: dayDate.getDate() === this.currentDate.getDate() && 
-                                      dayDate.getMonth() === this.currentDate.getMonth() && 
-                                      dayDate.getFullYear() === this.currentDate.getFullYear(),
+                        isCurrentDay: dayDate.getDate() === this._currentDate.getDate() && 
+                                      dayDate.getMonth() === this._currentDate.getMonth() && 
+                                      dayDate.getFullYear() === this._currentDate.getFullYear(),
                         dayOfWeek: i 
                     };
                     
                     week.push(dayInfo);
-                    currentDate.setDate(currentDate.getDate() + 1);
+                    _currentDate.setDate(_currentDate.getDate() + 1);
                 }
                 
                 if (week.some(day => day.isCurrentMonth)) {
@@ -136,9 +142,9 @@ export default {
     },
     changeCurrentDate(date) {
         // console.log('month', date)
-        this.currentDate = date;
-        this.month = this.currentDate.getMonth();
-        this.year = this.currentDate.getFullYear();
+        this._currentDate = date;
+        this.month = this._currentDate.getMonth();
+        this.year = this._currentDate.getFullYear();
         this.$emit('selectDay', date);
     },
     parseDate() {
@@ -154,10 +160,15 @@ export default {
     }
   },
   mounted() {
-    this.currentDate = new Date();
-    this.month = this.currentDate.getMonth();
-    this.year = this.currentDate.getFullYear();
-    // console.log(this.currentDate)
+    const regex = /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/;
+    if (regex.test(this.currentDate) && this.currentDate.length == 10) {
+        this._currentDate = new Date(this.currentDate);
+    } else {
+        this._currentDate = new Date();
+    }
+    this.month = this._currentDate.getMonth();
+    this.year = this._currentDate.getFullYear();
+    // console.log(this._currentDate)
   }
 };
 </script>
