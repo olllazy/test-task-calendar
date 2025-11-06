@@ -5,14 +5,14 @@ import WeekHeader from './WeekHeader.vue';
 
 <template>
     <div style="display: flex;">
-        {{ currentLanguage }} {{ month }} {{ year }}
+        {{ locale }} {{ month }} {{ year }} {{ currentDate }}
     </div>
     <div style="width: fit-content; display: flex; flex-direction: column; gap: 0.1rem">
         <div style="display: flex; gap: 0.1rem; justify-content: space-between; padding: 0.1rem;">
-            <select v-model="currentLanguage" style="width: 7rem;">
+            <select v-model="locale" style="width: 7rem;">
                 <option v-for="language in languages" :value="language.id">{{ language.label }}</option>
             </select>
-            <input v-model="searchDateString" @change="parseDate()" style="width: 10rem;"></input>
+            <input placeholder="yyyy-mm-dd" v-model="searchDateString" @change="parseDate()" style="width: 10rem;"></input>
         </div>
         <div style="display: flex; gap: 0.1rem; justify-content: space-between; padding: 0.1rem;">
             <button @click="decreaseMonth"><i class="arrow left"></i></button>
@@ -22,8 +22,8 @@ import WeekHeader from './WeekHeader.vue';
             <button @click="increaseMonth"><i class="arrow right"></i></button>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.1rem;">
-            <WeekHeader :days="days"/>
-            <Week v-for="week in weeks" :days="week"/>
+            <WeekHeader :days="weekDays"/>
+            <Week v-for="week in weeks" :days="week" @select-day="(day) => changeCurrentDate(day)"/>
         </div>   
     </div>    
 </template>
@@ -33,20 +33,11 @@ export default {
   name: 'Calendar',
   data() {
     return {
-        currentLanguage: 'ru-RU',
+        locale: 'ru-RU',
         month: null,
         year: null,
         currentDate: null,
         searchDateString: null,
-
-        // weeks: [
-        //     [1,2,3,4,5,6,7],
-        //     [8,9,10,11,12,13,14],
-        //     [15,16,17,18,19,20,21],
-        //     [22,23,24,25,26,27,28],
-        //     [29,30,31]
-        // ],
-        days: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
         languages: [{id:'en-EN', label:'English'},{id:'ru-RU', label:'Русский'}]
     }
   },
@@ -55,9 +46,25 @@ export default {
         get: function() {
             if (this.month != null) {
                 const date = new Date(2000, this.month, 1); 
-                return date.toLocaleString(this.currentLanguage, { month: 'long' }).toUpperCase();
+                return date.toLocaleString(this.locale, { month: 'long' }).toUpperCase();
             } else 
                 return null
+        }
+    },
+    weekDays: {
+        get() {
+            const monday = new Date(2023, 0, 2);
+            const res = [];
+            
+            // Получаем названия всех дней недели
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + i);
+                
+                const name = date.toLocaleDateString(this.locale, { weekday: 'short' });
+                res.push(name);
+            }
+            return res;
         }
     },
     weeks: {
@@ -91,6 +98,9 @@ export default {
                         date: dayDate,
                         day: dayDate.getDate(),
                         isCurrentMonth: dayDate.getMonth() === this.month && dayDate.getFullYear() === this.year,
+                        isCurrentDay: dayDate.getDate() === this.currentDate.getDate() && 
+                                      dayDate.getMonth() === this.currentDate.getMonth() && 
+                                      dayDate.getFullYear() === this.currentDate.getFullYear(),
                         dayOfWeek: i 
                     };
                     
@@ -124,14 +134,18 @@ export default {
             this.month += 1;
         }
     },
+    changeCurrentDate(date) {
+        console.log('month', date)
+        this.currentDate = date;
+        this.month = this.currentDate.getMonth();
+        this.year = this.currentDate.getFullYear();
+    },
     parseDate() {
         let searchDate = null;
         try {
             searchDate = new Date(this.searchDateString);
             this.searchDateString = null;
-            this.currentDate = searchDate;
-            this.month = this.currentDate.getMonth();
-            this.year = this.currentDate.getFullYear();
+            this.changeCurrentDate(searchDate);
         } catch (error) {
             return console.log('Error! Wrong format date!')
         }

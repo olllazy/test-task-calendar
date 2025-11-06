@@ -1,5 +1,5 @@
 <template>
-    <div :class="computedClass" @click="dayClick">
+    <div :class="computedClass" @click="selectDay">
         {{ (day)?day.day:'' }}
     </div>
 </template>
@@ -16,21 +16,23 @@ export default {
     }
   },
   methods: {
-    dayClick() {
-        if (this.day.isCurrentMonth) {
-            this.checked = !this.checked;
-            console.log(this.day.date);
-        }        
+    selectDay() {
+        console.log('day', this.day.date)
+        this.$emit('selectDay', this.day.date)      
     }
   },
   computed: {
     computedClass: {
         get: function() {
             let res = 'day-container'
+            if (this.day.isCurrentDay) {
+                res += ' current current-day'
+                return res;
+            }
             if (this.day.isCurrentMonth) {
-                res += ' current-year'
+                res += ' current current-month'
             } else {
-                res += ' not-current-year'
+                res += ' not-current'
             }
             return res
         }
@@ -47,16 +49,16 @@ export default {
         align-content: center;
         border: 0.1rem solid transparent;
     }
-    .not-current-year {
+    .not-current {
         background-color: lightgrey;
     }
-    .current-year {
-        background-color: transparent;
+    .current-day {
+        background-color: skyblue;
     }
-    .current-year:hover {
+    .current:hover {
         border-color:skyblue;
     }
-    .current-year:active  {
+    .current:active  {
         border-color: plum;
     }
 </style>
