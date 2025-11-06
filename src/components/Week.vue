@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     selectDay(date) {
-        console.log('week', date);
+        // console.log('week', date);
         this.$emit('selectDay', date);
     }
   }

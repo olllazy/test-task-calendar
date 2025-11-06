@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     selectDay() {
-        console.log('day', this.day.date)
+        // console.log('day', this.day.date)
         this.$emit('selectDay', this.day.date)      
     }
   },

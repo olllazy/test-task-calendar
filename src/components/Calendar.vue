@@ -4,9 +4,6 @@ import WeekHeader from './WeekHeader.vue';
 </script>
 
 <template>
-    <div style="display: flex;">
-        {{ locale }} {{ month }} {{ year }} {{ currentDate }}
-    </div>
     <div style="width: fit-content; display: flex; flex-direction: column; gap: 0.1rem">
         <div style="display: flex; gap: 0.1rem; justify-content: space-between; padding: 0.1rem;">
             <select v-model="locale" style="width: 7rem;">
@@ -38,7 +35,10 @@ export default {
         year: null,
         currentDate: null,
         searchDateString: null,
-        languages: [{id:'en-EN', label:'English'},{id:'ru-RU', label:'Русский'}]
+        languages: [
+            {id:'en-EN', label:'English'},
+            {id:'ru-RU', label:'Русский'}
+        ]
     }
   },
   computed: {
@@ -135,7 +135,7 @@ export default {
         }
     },
     changeCurrentDate(date) {
-        console.log('month', date)
+        // console.log('month', date)
         this.currentDate = date;
         this.month = this.currentDate.getMonth();
         this.year = this.currentDate.getFullYear();
@@ -147,7 +147,7 @@ export default {
             this.searchDateString = null;
             this.changeCurrentDate(searchDate);
         } catch (error) {
-            return console.log('Error! Wrong format date!')
+            console.log('Error! Wrong format date!')
         }
     }
   },
@@ -155,7 +155,7 @@ export default {
     this.currentDate = new Date();
     this.month = this.currentDate.getMonth();
     this.year = this.currentDate.getFullYear();
-    console.log(this.currentDate)
+    // console.log(this.currentDate)
   }
 };
 </script>
