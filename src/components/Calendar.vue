@@ -139,14 +139,16 @@ export default {
         this.currentDate = date;
         this.month = this.currentDate.getMonth();
         this.year = this.currentDate.getFullYear();
+        this.$emit('selectDay', date);
     },
     parseDate() {
-        let searchDate = null;
-        try {
-            searchDate = new Date(this.searchDateString);
+        const regex = /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/;
+        if (regex.test(this.searchDateString) && this.searchDateString.length == 10)
+        {
+            const searchDate = new Date(this.searchDateString);
             this.searchDateString = null;
             this.changeCurrentDate(searchDate);
-        } catch (error) {
+        } else {
             console.log('Error! Wrong format date!')
         }
     }
